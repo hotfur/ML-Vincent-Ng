@@ -43,12 +43,13 @@ def LearnTree(data, entropy):
         if attr == "class":
             continue
         cur_subnodes = [y for x, y in data.groupby(attr, as_index=False)]
-        cur_IG = entropy
+        cur_IG = 0
         cur_subnodes_entropies = list()
         for node in cur_subnodes:
             node_entropy = Entropy(np.bincount(node["class"]))
             cur_subnodes_entropies.append(node_entropy)
-            cur_IG -= node_entropy * node.shape[0]/data.shape[0]
+            cur_IG -= node_entropy * node.shape[0]
+        cur_IG = cur_IG/data.shape[0] + entropy
         if cur_IG > largest_IG:
             largest_IG = cur_IG
             attr_name = attr
