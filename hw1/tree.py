@@ -29,12 +29,3 @@ class Node:
         if self.children is not None:
             for child in self.children:
                 child.printer(depth=depth+1)
-
-    # Tree traversal for classification task
-    def traversal(self, attr_list):
-        # Base case
-        if attr_list.empty:
-            return self.class_value
-        # Recursive case
-        attr_list.remove(self.attr)
-        return
