@@ -13,14 +13,17 @@ import tree
 def main(percentage=1):
     train = pd.read_table(sys.argv[1], sep='\t', lineterminator='\n')
     test = pd.read_table(sys.argv[2], sep='\t', lineterminator='\n')
+    # Split the train set for plotting accuracy
     mask = np.random.choice([True, False], size=train.shape[0], p=[percentage, 1-percentage])
     train = train[mask]
-    # Tie breaking
+    # Tie breaking - Whole dataset
     global most_freq
     values, counts = np.unique(train["class"], return_counts=True)
     sort_values = np.argsort(-counts)
     most_freq = values[sort_values], counts[sort_values]
+    # Precalculate the entropy for the whole dataset
     entropy = Entropy(counts)
+    # Algorithm is destructive so keep a copy here for accuracy calculation later
     train_copy = train.copy(deep=True)
     root = LearnTree(train, entropy)
     train_acc = round(100 - (100/train_copy.shape[0])*(TestTree(data=train_copy, tree=root)), 1)
@@ -29,6 +32,9 @@ def main(percentage=1):
 
 
 def LearnTree(data, entropy):
+    """
+    Build a decision tree based on training dataset and its entropy
+    """
     # Base cases
     # Case 0: Entropy equals to 0 (pure node)
     if entropy == 0:
@@ -41,6 +47,7 @@ def LearnTree(data, entropy):
         values, counts = np.unique(data["class"], return_counts=True)
         sort_values = np.argsort(-counts)
         local_most_freq = values[sort_values], counts[sort_values]
+        # Tie breaking
         if local_most_freq[1][0] == local_most_freq[1][1]:
             value0 = local_most_freq[0][0]
             value1 = local_most_freq[0][1]
@@ -54,9 +61,12 @@ def LearnTree(data, entropy):
     subnodes = list()
     subnodes_entropies = list()
     for attr in data.columns:
+        # Skip class as it is not an attribute
         if attr == "class":
             continue
+        # Split dataset by attribute into a list of n distinct values
         cur_subnodes = [y for x, y in data.groupby(attr, as_index=False)]
+        # Entropy and Information Gain calculation for every possible subnodes
         cur_IG = 0
         cur_subnodes_entropies = list()
         for node in cur_subnodes:
@@ -70,13 +80,14 @@ def LearnTree(data, entropy):
             attr_name = attr
             subnodes = cur_subnodes
             subnodes_entropies = cur_subnodes_entropies
-    # Add to tree datastructure the result - Continue code here
+    # Add the chosen attribute to tree datastructure
     cur_tree_children = list()
     attr_value_set = {0, 1, 2}
     for i in range(len(subnodes)):
-        # Drop the attribute from the subnode dataset
+        # Add attribute value to the subtree
         attr_value = subnodes[i][attr_name].iloc[-1]
         attr_value_set.remove(attr_value)
+        # Drop the attribute from the subnode dataset
         subnodes[i].drop(attr_name, axis=1, inplace=True)
         subtree = LearnTree(subnodes[i], subnodes_entropies[i])
         # Assign the attribute name and value to the subtree
@@ -85,7 +96,8 @@ def LearnTree(data, entropy):
         # Add the subtree to current tree
         cur_tree_children.append(subtree)
 
-    # Trouble: Have to scan over all possible attribute values [0,1,2] but in reality there is no need for that
+    # Have to scan over all possible attribute values [0,1,2] and add to the tree
+    # Can we save some data on the tree? They are going to base case 2 anyway...
     for i in attr_value_set:
         data.drop(data.index, inplace=True)
         subtree = LearnTree(data, 99)
@@ -96,6 +108,9 @@ def LearnTree(data, entropy):
 
 
 def Entropy(count):
+    """
+    Calculate entropy from the distribution of a dataset
+    """
     num_ins = np.sum(count)
     entropy = 0
     for i in count:
@@ -106,6 +121,9 @@ def Entropy(count):
 
 
 def TestTree(data, tree):
+    """
+    Classify the data based on a decision tree and output the number of incorrectly classified instances.
+    """
     incorrect = 0
     if tree.attr is not None:
         if (tree.class_value is not None):
