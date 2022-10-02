@@ -10,7 +10,7 @@ import tree
 
 def main():
     train = pd.read_table(sys.argv[1], sep='\t', lineterminator='\n')
-    # test = pd.read_table(sys.argv[2], sep='\t', lineterminator='\n')
+    test = pd.read_table(sys.argv[2], sep='\t', lineterminator='\n')
     # Tie breaking
     global most_freq
     count = np.bincount(train["class"])
@@ -18,6 +18,13 @@ def main():
     entropy = Entropy(count)
     root = LearnTree(train, entropy)
     root.printer()
+    train_acc_data = TestTree(data=train, tree=root)
+    train_acc = AccuracyTest(train_acc_data)
+    print("Accuracy on training set (" + str(train.shape[0]) + " instances): " + str(train_acc) + "%")
+    test_acc_data = TestTree(data=test, tree=root)
+    test_acc = AccuracyTest(test_acc_data)
+    print("Accuracy on test set (" + str(test.shape[0]) + " instances): " + str(test_acc) + "%")
+
 
 def LearnTree(data, entropy):
     # Base cases
@@ -31,11 +38,12 @@ def LearnTree(data, entropy):
     if len(data.columns) == 1:
         count = np.bincount(data["class"])
         max_index = np.argmax(count)
-        if count[max_index] == count[most_freq]:
-            return tree.Node(class_value=most_freq)
+        if len(count) > most_freq:
+            if count[max_index] == count[most_freq]:
+                return tree.Node(class_value=most_freq)
         return tree.Node(class_value=max_index)
     # Recursive case
-    largest_IG = 0
+    largest_IG = -9999
     attr_name = ""
     subnodes = list()
     subnodes_entropies = list()
@@ -79,8 +87,30 @@ def Entropy(count):
     return entropy / num_ins + np.log2(num_ins)
 
 
-def TestTree():
-    return
+def TestTree(data, tree):
+    processed_data = list()
+    if tree.attr is not None:
+        if tree.class_value is not None:
+            data.loc[data["class"] == tree.class_value, 'class'] = True
+            data.loc[data["class"] != tree.class_value, 'class'] = False
+            data.loc[data["class"] == most_freq, 'class'] = True
+            return data
+        for child in range(len(tree.children)):
+            processed_data.append(TestTree(data[data[tree.attr] == child], tree.children[child]))
+
+    elif tree.children is not None:
+        for child in tree.children:
+            processed_data.append(TestTree(data, child))
+    processed_data = pd.concat(processed_data)
+    return processed_data
+
+def AccuracyTest(data):
+    values, counts = np.unique(data["class"], return_counts=True)
+    accuracy = 100/data.shape[0]
+    for i in range(len(values)):
+        if values[i]:
+            accuracy *= counts[i]
+    return accuracy
 
 
 if __name__ == "__main__":

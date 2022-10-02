@@ -33,6 +33,8 @@ tea = 0 :
 | | | | | wesley = 0 : 0
 | | | | | wesley = 1 : 0
 | | | | poetry = 1 :
+| | | | | wesley = 0 : 0
+| | | | | wesley = 1 : 0
 | | | romulan = 1 :
 | | | | wesley = 0 :
 | | | | | poetry = 0 : 0
@@ -94,6 +96,8 @@ tea = 1 :
 | | | | poetry = 1 : 0
 | | | romulan = 1 :
 | | | | wesley = 0 :
+| | | | | poetry = 0 : 0
+| | | | | poetry = 1 : 0
 | | | | wesley = 1 : 0
 | | honor = 1 :
 | | | wesley = 0 :
@@ -111,3 +115,5 @@ tea = 1 :
 | | | | | poetry = 0 : 0
 | | | | | poetry = 1 : 0
 tea = 2 : 2
+Accuracy on training set (800 instances): 99.99999999999999%
+Accuracy on test set (203 instances): 100.0%
