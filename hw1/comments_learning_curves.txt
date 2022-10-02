@@ -1,0 +1,9 @@
+How curves was constructed: The train set was randomly split into a fraction of its original size, then used to build the decision trees
+First dataset (train.dat) learning curve: 100 datapoints corresponding to accuracy of decision tree made using 1%-100% of the original training set
+- This curve looks like a typical learning curve, which more datapoints do dimishing return impact on the acccuracy of the model.
+Second dataset (train2.dat) learning curve: 50 datapoints corresponding to accuracy of decision tree made using 2%-100% of the original training set
+- This curve on average take a similar shape to first curve, but is unstable. Perhaps random selection of data is a bad idea on this dataset
+Third dataset (train3.dat) learning curve: 50 datapoints corresponding to accuracy of decision tree made using 2%-100% of the original training set
+- This curve on average looks like a straight line! This is an indication that the dataset might not be big enough to be representative of the population
+Fourth dataset (train4.dat) learning curve: 100 datapoints corresponding to accuracy of decision tree made using 1%-100% of the original training set
+- This curve on average looks like a straight line! This is an indication that the dataset might not be big enough to be representative of the population
