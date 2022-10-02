@@ -161,7 +161,9 @@ def plotting_multi(steps):
     sessions = pool.map(main, percent_dataset)
     for session in sessions:
         acc_series.append(session[2])
-    #plt.plot(percent_dataset, acc_series)
+    #plt.plot(percent_dataset*100, acc_series)
+    #plt.xlabel("Percentage of original dataset used as training set")
+    #plt.ylabel("Accuracy of decision tree on test set (%)")
     #plt.show()
 
 if __name__ == "__main__":
