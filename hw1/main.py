@@ -4,27 +4,28 @@
 
 import numpy as np
 import pandas as pd
+#from matplotlib import pyplot as plt
+import multiprocessing
 import sys
 import tree
 
 
-def main():
+def main(percentage=1):
     train = pd.read_table(sys.argv[1], sep='\t', lineterminator='\n')
     test = pd.read_table(sys.argv[2], sep='\t', lineterminator='\n')
+    mask = np.random.choice([True, False], size=train.shape[0], p=[percentage, 1-percentage])
+    train = train[mask]
     # Tie breaking
     global most_freq
     values, counts = np.unique(train["class"], return_counts=True)
     sort_values = np.argsort(-counts)
     most_freq = values[sort_values], counts[sort_values]
     entropy = Entropy(counts)
+    train_copy = train.copy(deep=True)
     root = LearnTree(train, entropy)
-    root.printer()
-    print()
-    train_acc = 100 - 100*(TestTree(data=train, tree=root))/train.shape[0]
-    print("Accuracy on training set (" + str(train.shape[0]) + " instances): " + str(train_acc) + "%")
-    print()
-    test_acc = 100 - 100*TestTree(data=test, tree=root)/test.shape[0]
-    print("Accuracy on test set (" + str(test.shape[0]) + " instances): " + str(test_acc) + "%")
+    train_acc = round(100 - (100/train_copy.shape[0])*(TestTree(data=train_copy, tree=root)), 1)
+    test_acc = round(100 - (100/test.shape[0])*TestTree(data=test, tree=root), 1)
+    return root, train_acc, test_acc, train_copy.shape[0], test.shape[0]
 
 
 def LearnTree(data, entropy):
@@ -114,6 +115,7 @@ def TestTree(data, tree):
         incorrect += TestTree(data[(data[child.attr] == child.attr_value)], child)
     return incorrect
 
+
 def AccuracyTest(data):
     values, counts = np.unique(data["class"], return_counts=True)
     accuracy = 100/data.shape[0]
@@ -123,5 +125,32 @@ def AccuracyTest(data):
     return accuracy
 
 
+def plotting(steps):
+    """Dirty code"""
+    acc_series = list()
+    percent_dataset = np.linspace(start=1/steps, stop=1, num=steps)
+    for i in percent_dataset:
+        root, train_acc, test_acc, train_shape, test_shape = main(i)
+        acc_series.append(test_acc)
+    #plt.plot(percent_dataset, acc_series)
+    #plt.show()
+
+def plotting_multi(steps):
+    """Dirty code"""
+    pool = multiprocessing.Pool()
+    acc_series = list()
+    percent_dataset = np.linspace(start=1/steps, stop=1, num=steps)
+    sessions = pool.map(main, percent_dataset)
+    for session in sessions:
+        acc_series.append(session[2])
+    #plt.plot(percent_dataset, acc_series)
+    #plt.show()
+
 if __name__ == "__main__":
-    main()
+    #plotting_multi(100)
+    root, train_acc, test_acc, train_shape, test_shape = main()
+    root.printer()
+    print()
+    print("Accuracy on training set (" + str(train_shape) + " instances): " + str(train_acc) + "%")
+    print()
+    print("Accuracy on test set (" + str(test_shape) + " instances): " + str(test_acc) + "%")
