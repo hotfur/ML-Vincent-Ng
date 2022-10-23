@@ -17,6 +17,8 @@ def main():
     test = test.groupby(list(test.columns)).size().reset_index(name="count")
     # Training and printing tree
     root = training(train)
+    # Filler to fill missing attribute values
+    root = filler(root)
     printer(root)
     # Accuracy calculation
     train_acc = round(100 - (100/train_size)*(accuracytest(data=train, tree=root)), 2)
@@ -36,28 +38,42 @@ def training(train):
     for class_value, data in train.groupby("class", as_index=False):
         attr_list = {}
         data_count = data["count"].sum()
-        attr_list["class_proba"] = round(data_count / train_count, 2)
+        attr_list["class_proba"] = data_count / train_count
         for attr in train.columns:
             if attr == "class" or attr == "count":
                 continue
             attr_value_list = {}
             for attr_value, attr_split in data.groupby(attr, as_index=False):
-                attr_value_list[attr_value] = round(attr_split["count"].sum() / data_count, 2)
+                attr_value_list[attr_value] = attr_split["count"].sum() / data_count
             attr_list[attr] = attr_value_list
         root[class_value] = attr_list
     return root
 
+def filler(tree):
+    """
+    Fill missing attributes' probability in the tree.
+    In reality this function should be removed, as attribute values not found
+    in training is obviously 0
+    """
+    for cls in tree:
+        for attr in tree[cls]:
+            if attr == "class_proba":
+                continue
+            for attr_value in range(2):
+                if not attr_value in tree[cls][attr]:
+                    tree[cls][attr][attr_value] = 0
+    return tree
 
 def printer(tree):
     """Print tree in correct format"""
     for cls in tree:
-        print("P(C=" + str(cls) + ")=" + str(tree[cls]["class_proba"]), end=" ")
+        print("P(C=" + str(cls) + ")=" + str(round(tree[cls]["class_proba"], 2)), end=" ")
         for attr in tree[cls]:
             if attr == "class_proba":
                 continue
             for attr_value in tree[cls][attr]:
                 print("P(" + str(attr) + "=" + str(attr_value) + "|" + str(cls) + ")=" + str(
-                    tree[cls][attr][attr_value]), end=" ")
+                    round(tree[cls][attr][attr_value], 2)), end=" ")
         print()
 
 
@@ -78,7 +94,11 @@ def accuracytest(data, tree):
             if col == "class" or col == "count":
                 continue
             for child in range(len(tree)):
-                proba_arr[child] *= tree[child][col][data[col][row]]
+                proba = tree[child][col].get(data[col][row])
+                if proba is not None:
+                    proba_arr[child] *= proba
+                else:
+                    proba_arr[child] *= 0
         if data["class"][row] != np.argmax(proba_arr):
             incorrect += data["count"][row]
     return incorrect
