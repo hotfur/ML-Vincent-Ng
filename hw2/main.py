@@ -21,8 +21,8 @@ def main():
     root = filler(root)
     printer(root)
     # Accuracy calculation
-    train_acc = round(100 - (100/train_size)*(accuracytest(data=train, tree=root)), 2)
-    test_acc = round(100 - (100/test_size)*accuracytest(data=test, tree=root), 2)
+    train_acc = round(100 - (100 / train_size) * (accuracytest(data=train, tree=root)), 2)
+    test_acc = round(100 - (100 / test_size) * accuracytest(data=test, tree=root), 2)
     print()
     print("Accuracy on training set (" + str(train_size) + " instances): " + str(train_acc) + "%")
     print()
@@ -49,6 +49,7 @@ def training(train):
         root[class_value] = attr_list
     return root
 
+
 def filler(tree):
     """
     Fill missing attributes' probability in the tree.
@@ -60,9 +61,10 @@ def filler(tree):
             if attr == "class_proba":
                 continue
             for attr_value in range(2):
-                if not attr_value in tree[cls][attr]:
+                if attr_value not in tree[cls][attr]:
                     tree[cls][attr][attr_value] = 0
     return tree
+
 
 def printer(tree):
     """Print tree in correct format"""
