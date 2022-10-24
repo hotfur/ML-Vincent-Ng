@@ -67,7 +67,7 @@ def filler(tree):
 def printer(tree):
     """Print tree in correct format"""
     for cls in tree:
-        print("P(C=" + str(cls) + ")=" + str(round(tree[cls]["class_proba"], 2)), end=" ")
+        print("P(class=" + str(cls) + ")=" + str(round(tree[cls]["class_proba"], 2)), end=" ")
         for attr in tree[cls]:
             if attr == "class_proba":
                 continue
