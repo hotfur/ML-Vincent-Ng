@@ -35,7 +35,7 @@ def read_input(data):
 
 def solve_mdp(r, prob, gamma):
     J = list(r)
-    for i in range(1, 21):
+    for i in range(1, 1001):
         new_J = list(J)
         # Formatting
         if i != 1:
