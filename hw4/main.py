@@ -15,11 +15,27 @@ def main():
         data = train.iloc[[np.mod(i, train.shape[0])]]
         x = np.array(data.iloc[:, 0:train.shape[1]-1])
         xw = x@weights
-        weights += x[0]*alpha*sigmoid(xw, derivative=True)*np.array(data["class"] - sigmoid(xw))
+        output = sigmoid(xw)
+        weights += x[0]*alpha*sigmoid(xw, derivative=True)*np.array(data["class"] - output)
+        # Printer
+        print("After iteration %i: " %(i+1), end='')
+        for i in range(len(weights)):
+            print("w(%s)=%5.4f" %(data.columns[i], weights[i]), end=', ')
+        print("output=%5.4f" %(output))
+    print(f"\nAccuracy on training set ({train.shape[0]} instances): {classification(train, weights):2.1f}%")
+    print(f"\nAccuracy on test set ({test.shape[0]} instances): {classification(test, weights):2.1f}%")
 
+def classification(data, weights):
+    correct = 0
+    for i in range(data.shape[0]):
+        row = data.iloc[[i]]
+        x = np.array(row.iloc[:, 0:data.shape[1] - 1])
+        if (sigmoid(x @ weights) >= 0.5) == row["class"].all():
+            correct += 1
+    return 100*correct/data.shape[0]
 
 def sigmoid(x, derivative = False):
-    temp = 1 / (1 + np.e ** (x))
+    temp = 1 / (1 + np.e ** (-x))
     if derivative:
         return temp * (1 - temp)
     return temp
