@@ -1,0 +1,60 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-d0094a50bb2071803777.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "Written_Code",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "Written_Code::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Written_Code-Debug-937c5e8c49f4c41114cf.json",
+					"name" : "Written_Code",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "D:/OneDrive_Fulbright University Vietnam/OneDrive - Fulbright University Vietnam/Year 3_Sem1/Intro to ML/Assignment/Assignment 5/Written Code/cmake-build-debug",
+		"source" : "D:/OneDrive_Fulbright University Vietnam/OneDrive - Fulbright University Vietnam/Year 3_Sem1/Intro to ML/Assignment/Assignment 5/Written Code"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 4
+	}
+}
