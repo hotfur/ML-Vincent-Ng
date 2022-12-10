@@ -17,8 +17,10 @@ def main():
     pi = sumP/num_ins
     x_muy = train-mean[:,None]
     variance = (((x_muy*prob_arr)@x_muy.T)/sumP)[:,0]
+    print()
     print("E step")
     prob = np.exp(-np.square(x_muy)/variance[:,None])/(np.sqrt(2*np.pi)*np.sqrt(variance))
+    prob_arr = prob/np.sum(prob, axis=0)
 
 
 if __name__ == "__main__":
