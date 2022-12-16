@@ -1,0 +1,62 @@
+92
+{'max_leaf_nodes': 800,
+ 'max_iter': 300,
+ 'learning_rate': 0.8500000000000002,
+ 'l2_regularization': 0.8500000000000001}
+ est_max_depth ~40
+ 
+ 91
+ {'max_leaf_nodes': 780,
+ 'max_iter': 300,
+ 'learning_rate': 0.6,
+ 'l2_regularization': 0.6000000000000001}
+ est_max_depth ~40
+ 
+ 87_low_depth_low_leaf
+ {'max_leaf_nodes': 205,
+ 'max_iter': 220,
+ 'max_depth': 32,
+ 'max_bins': 78,
+ 'learning_rate': 0.5,
+ 'l2_regularization': 0.6500000000000001}
+ 
+ 87
+ {'max_leaf_nodes': 470,
+ 'max_iter': 200,
+ 'max_depth': 36,
+ 'l2_regularization': 0.75}
+ 
+ 87.7
+ {'max_leaf_nodes': 600,
+ 'max_iter': 400,
+ 'l2_regularization': 0.35000000000000003}
+ 
+ 86.2
+ {'max_leaf_nodes': 330,
+ 'max_iter': 400,
+ 'max_depth': 21,
+ 'l2_regularization': 0.8500000000000001}
+ 
+ 85
+ {'max_leaf_nodes': 250,
+ 'max_iter': 200,
+ 'max_depth': 13,
+ 'l2_regularization': 0.45}
+ 
+ 80
+ {'max_leaf_nodes': 140,
+ 'max_iter': 40,
+ 'max_depth': 9,
+ 'l2_regularization': 0.75}
+ 
+ 77
+ {'max_leaf_nodes': 650,
+ 'max_iter': 200,
+ 'max_depth': 6,
+ 'l2_regularization': 0.8500000000000001}
+ 
+ 733
+ {'max_leaf_nodes': 130,
+ 'max_iter': 300,
+ 'max_depth': 4,
+ 'l2_regularization': 0.9500000000000001}
