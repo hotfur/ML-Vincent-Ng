@@ -1,21 +1,15 @@
 FEATURE ['C1' 'C3' 'C5' 'C6' 'C8' 'C13' 'C16' 'C17' 'C19' 'C26' 'C31' 'C48' 'C53'
  'C59' 'C64' 'C69' 'C70' 'C94' 'C97' 'CT3' 'CT16' 'CT26' 'CH3'] With PCA (25_feat.pkl)
 
-923_newmethod
-{'max_leaf_nodes': 280,
- 'max_depth': 30,
- 'max_bins': 112,
- 'learning_rate': 0.8500000000000001,
- 'l2_regularization': 0.8500000000000003}
 
-914_newmethod
+<*> 914_newmethod
 {'max_leaf_nodes': 240,
  'max_depth': 30,
  'max_bins': 92,
  'learning_rate': 0.8,
  'l2_regularization': 0.7500000000000002}
 
-909_newmethod
+<*> 909_newmethod
 {'max_leaf_nodes': 300,
  'max_depth': 18,
  'max_bins': 86,
@@ -25,19 +19,6 @@ FEATURE ['C1' 'C3' 'C5' 'C6' 'C8' 'C13' 'C16' 'C17' 'C19' 'C26' 'C31' 'C48' 'C53
 
  FEATURE ['C5', 'C8', 'C13', 'C17', 'C26', 'C31', 'C59', 'C70', 'C97', 'CT3', 'CT16', 'CT26', 'CH3'] (15_feat.pkl)
  
- 90_low_depth_leaf_model_newmethod_naive
- {'max_leaf_nodes': 300,
- 'max_depth': 20,
- 'max_bins': 78,
- 'learning_rate': 0.5,
- 'l2_regularization': 0.9500000000000004}
- 
- 888_low_depth_leaf_model_newmethod
- {'max_leaf_nodes': 380,
- 'max_depth': 16,
- 'max_bins': 96,
- 'learning_rate': 0.5,
- 'l2_regularization': 0.8000000000000003}
  
 
 OLD MODEL
@@ -50,14 +31,4 @@ OLD MODEL
  'learning_rate': 0.5,
  'l2_regularization': 0.6500000000000001}
  
- 85
- {'max_leaf_nodes': 250,
- 'max_iter': 200,
- 'max_depth': 13,
- 'l2_regularization': 0.45}
- 
- 80
- {'max_leaf_nodes': 140,
- 'max_iter': 40,
- 'max_depth': 9,
- 'l2_regularization': 0.75}
+
