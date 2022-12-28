@@ -9,9 +9,9 @@ import multiprocessing
 def main():
     # Dataloader and preprocessing to reduce problem to typical HMM problem
     n, m, iterations = int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3])
-    start = np.loadtxt(sys.argv[4], dtype=np.longdouble)
-    trans = np.concatenate((np.loadtxt(sys.argv[5], dtype=np.longdouble), np.zeros(n)[None, :]), axis=0)
-    emit = np.concatenate((np.loadtxt(sys.argv[6], dtype=np.longdouble), np.zeros(m)[None, :]), axis=0)
+    start = np.loadtxt(sys.argv[4], dtype=np.float32)
+    trans = np.concatenate((np.loadtxt(sys.argv[5], dtype=np.float32), np.zeros(n)[None, :]), axis=0)
+    emit = np.concatenate((np.loadtxt(sys.argv[6], dtype=np.float32), np.zeros(m)[None, :]), axis=0)
     data = np.char.strip(a=np.loadtxt(sys.argv[7], dtype=str), chars='o').astype(int) - 1
     num_seq = data.shape[0]
     # Open multiprocessor pool to execute task in parallel
