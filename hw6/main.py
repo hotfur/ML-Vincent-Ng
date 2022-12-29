@@ -12,7 +12,12 @@ def main():
     start = np.loadtxt(sys.argv[4], dtype=np.float32)
     trans = np.concatenate((np.loadtxt(sys.argv[5], dtype=np.float32), np.zeros(n)[None, :]), axis=0)
     emit = np.concatenate((np.loadtxt(sys.argv[6], dtype=np.float32), np.zeros(m)[None, :]), axis=0)
+    # The emission for the fake symbol, which is 1 for the last state and 0 elsewhere
+    fake_emit = np.zeros(emit.shape[0])
+    fake_emit[-1] = 1
+    emit = np.concatenate((emit, fake_emit[:, None]), axis=1)
     data = np.char.strip(a=np.loadtxt(sys.argv[7], dtype=str), chars='o').astype(int) - 1
+    data = np.concatenate((data, np.full(data.shape[0], emit.shape[1]-1)[:,None]), axis=1)
     num_seq = data.shape[0]
     # Open multiprocessor pool to execute task in parallel
     pool = multiprocessing.Pool()
@@ -20,6 +25,7 @@ def main():
         # Calculate the variables of each sequence parallely
         args = []
         for seq in data:
+            seq = seq[~np.isnan(seq)]
             args.append((n, m, start, trans, emit, seq))
         results = pool.starmap(calc_seq, args)
         # Appends calculated matrices to the main 3d tensors, then reduce the tensor to a matrix
@@ -46,7 +52,7 @@ def main():
                 print("a_%d%d: %4.4f " % (row + 1, col + 1, trans[row, col]), end='')
             print()
         for row in range(emit.shape[0] - 1):
-            for col in range(emit.shape[1]):
+            for col in range(emit.shape[1] - 1):
                 print("b_%d(o%d): %4.4f " % (row + 1, col + 1, emit[row, col]), end='')
             print()
     pool.close()
@@ -55,35 +61,31 @@ def main():
 
 def calc_seq(n, m, start, trans, emit, seq):
     # Calculate alpha
-    alpha = np.empty(shape=(len(seq) + 1, n))
-    alpha[-1] = np.zeros(n)
-    alpha[-1][-1] = 1
+    alpha = np.empty(shape=(len(seq), n))
     alpha[0] = start * emit[:, seq[0]]
     for i in range(1, len(seq)):
         alpha[i] = (trans @ alpha[i - 1]) * emit[:, seq[i]]
+    alpha[-1][-1] = 1
     # Calculate beta
-    beta = np.empty(shape=(len(seq) + 1, n))
+    beta = np.empty(shape=(len(seq), n))
     beta[-1] = np.zeros(n)
     beta[-1][-1] = 1
-    for i in range(len(seq) - 1, -1, -1):
-        beta[i] = (trans @ beta[i + 1]) * emit[:, seq[i]]
+    for i in range(len(seq) - 2, -1, -1):
+        beta[i] = (trans @ (beta[i + 1] * emit[:, seq[i+1]]))
     # Calculate gamma
     ab_product = alpha * beta
     gamma = ab_product / np.sum(ab_product, axis=1)[:, None]
     # Calculate epsilon
     epsilon = np.empty(shape=(len(seq), n, n))
-    for t in range(0, len(seq)):
-        if t == len(seq) - 1:
-            layer = trans * (alpha[t][:, None] * beta[t + 1])
-        else:
-            layer = trans * (alpha[t][:, None] * beta[t + 1] * emit[:, seq[t + 1]])
+    for t in range(0, len(seq) - 1):
+        layer = trans * (alpha[t][:, None] * beta[t + 1] * emit[:, seq[t + 1]])
         epsilon[t] = layer / np.sum(layer)
     # Calculate qualities for return
     pi = gamma[0]
     a_numer = np.sum(epsilon, axis=0)
     ab_denom = np.sum(gamma, axis=0)
     # Calculate the indicator mask
-    indicator = np.zeros(shape=(len(seq) + 1, m))
+    indicator = np.zeros(shape=(len(seq), m + 1))
     for i in range(len(seq)):
         indicator[i, seq[i]] = 1
     b_numer = gamma.T @ indicator
