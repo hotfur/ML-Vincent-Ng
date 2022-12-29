@@ -1,31 +1,30 @@
-# HW5 EM clustering
+# HW6 HMM Baum–Welch algorithm
 # Vuong Kha Sieu
-# Date 7/12/2022
+# Date 29/12/2022
 import numpy as np
 import sys
 import multiprocessing
 
-#3 4 10 test.start test.trans test.emit test.data
 def main():
+    pool = multiprocessing.Pool()
     # Dataloader and preprocessing to reduce problem to typical HMM problem
     n, m, iterations = int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3])
-    start = np.loadtxt(sys.argv[4], dtype=np.float32)
-    trans = np.concatenate((np.loadtxt(sys.argv[5], dtype=np.float32), np.zeros(n)[None, :]), axis=0)
-    emit = np.concatenate((np.loadtxt(sys.argv[6], dtype=np.float32), np.zeros(m)[None, :]), axis=0)
+    start = np.loadtxt(sys.argv[4], dtype=np.float64)
+    trans = np.concatenate((np.loadtxt(sys.argv[5], dtype=np.float64), np.zeros(n)[None, :]), axis=0)
+    emit = np.concatenate((np.loadtxt(sys.argv[6], dtype=np.float64), np.zeros(m)[None, :]), axis=0)
     # The emission for the fake symbol, which is 1 for the last state and 0 elsewhere
     fake_emit = np.zeros(emit.shape[0])
     fake_emit[-1] = 1
     emit = np.concatenate((emit, fake_emit[:, None]), axis=1)
-    data = np.char.strip(a=np.loadtxt(sys.argv[7], dtype=str), chars='o').astype(int) - 1
-    data = np.concatenate((data, np.full(data.shape[0], emit.shape[1]-1)[:,None]), axis=1)
-    num_seq = data.shape[0]
+    with open(sys.argv[7], 'r') as file:
+        lines = file.readlines()
+    data = pool.map(split_lines, lines)
+    num_seq = len(data)
     # Open multiprocessor pool to execute task in parallel
-    pool = multiprocessing.Pool()
     for i in range(iterations):
         # Calculate the variables of each sequence parallely
         args = []
         for seq in data:
-            seq = seq[~np.isnan(seq)]
             args.append((n, m, start, trans, emit, seq))
         results = pool.starmap(calc_seq, args)
         # Appends calculated matrices to the main 3d tensors, then reduce the tensor to a matrix
@@ -58,16 +57,19 @@ def main():
     pool.close()
     return 0
 
+def split_lines(line):
+    return np.array(line.replace('o', '').split(), dtype=int) - 1
 
 def calc_seq(n, m, start, trans, emit, seq):
+    # Append fake symbol
+    seq = np.append(seq, m)
     # Calculate alpha
-    alpha = np.empty(shape=(len(seq), n))
+    alpha = np.zeros(shape=(len(seq), n))
     alpha[0] = start * emit[:, seq[0]]
     for i in range(1, len(seq)):
-        alpha[i] = (trans @ alpha[i - 1]) * emit[:, seq[i]]
-    alpha[-1][-1] = 1
+        alpha[i] = (trans.T @ alpha[i - 1]) * emit[:, seq[i]]
     # Calculate beta
-    beta = np.empty(shape=(len(seq), n))
+    beta = np.zeros(shape=(len(seq), n))
     beta[-1] = np.zeros(n)
     beta[-1][-1] = 1
     for i in range(len(seq) - 2, -1, -1):
@@ -76,7 +78,7 @@ def calc_seq(n, m, start, trans, emit, seq):
     ab_product = alpha * beta
     gamma = ab_product / np.sum(ab_product, axis=1)[:, None]
     # Calculate epsilon
-    epsilon = np.empty(shape=(len(seq), n, n))
+    epsilon = np.zeros(shape=(len(seq), n, n))
     for t in range(0, len(seq) - 1):
         layer = trans * (alpha[t][:, None] * beta[t + 1] * emit[:, seq[t + 1]])
         epsilon[t] = layer / np.sum(layer)
